@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-expand :clean, paths: ["pkg", "doc", ".yardoc", "tmp"]
+expand :clean, paths: ["pkg", "doc", ".yardoc", "tmp", "docs"]
 
 expand :minitest, libs: ["lib", "test"], files: ["test/**/*_test.rb"]
 
