@@ -37,6 +37,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.3.0"
 
   spec.add_dependency "opencensus", "~> 0.4.0"
+  spec.add_dependency "grpc", "~> 1.19"
+  spec.add_dependency "concurrent-ruby", "~> 1.1.5"
 
   spec.add_development_dependency "bundler", ">= 1.17", "< 3.0"
   spec.add_development_dependency "faraday", "~> 0.13"
@@ -45,8 +47,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-rg", "~> 5.2"
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "redcarpet", "~> 3.4"
-  spec.add_development_dependency "rubocop", "~> 0.63.1"
   spec.add_development_dependency "toys", "~> 0.7"
   spec.add_development_dependency "yard", "~> 0.9"
   spec.add_development_dependency "yard-doctest", "~> 0.1.6"
+  spec.add_development_dependency "google-style", "~> 0.1.0"
 end

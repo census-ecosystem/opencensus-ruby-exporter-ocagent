@@ -15,15 +15,20 @@
 # limitations under the License.
 
 
-require "opencensus"
+require "helper"
 
-## OpenCensus collects metrics and distributed traces from your services.
-module OpenCensus
-  ## The OCAgent exporter plugin
-  module OCAgent
+describe OpenCensus::Trace::Exporters::OCAgent::TraceEnumeratorQueue do
+  describe "#each_item" do
+    it "add items and iterate" do
+      enumerator = OpenCensus::Trace::Exporters::OCAgent::TraceEnumeratorQueue.new 0.1
+      enumerator.push "item1"
+      enumerator.push "item2"
+      enumerator.push :STOP
+
+      items = enumerator.each_item.map{ |v| v }
+      items.length.must_equal 2
+      items[0].must_equal "item1"
+      items[1].must_equal "item2"
+    end
   end
 end
-
-require "opencensus/ocagent/version"
-require "opencensus/trace/exporters/ocagent"
-require "opencensus/trace/exporters/sampler"

@@ -34,4 +34,18 @@ YARD::Rake::YardocTask.new do |t|
  t.stats_options = ['--list-undoc']         # optional
 end
 
+desc "Start an interactive shell."
+task :console do
+  require "irb"
+  require "irb/completion"
+  require "pp"
+
+  $LOAD_PATH.unshift "lib"
+
+  require "opencensus-ocagent"
+
+  ARGV.clear
+  IRB.start
+end
+
 task :default => [:test, :rubocop, :yard]

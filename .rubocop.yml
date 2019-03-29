@@ -8,6 +8,7 @@ AllCops:
     - "test/**/*"
     - "docs/**/*"
     - "tmp/**/*"
+    - "lib/opencensus/proto/**/*"
   TargetRubyVersion: 2.3
 Documentation:
   Enabled: false
