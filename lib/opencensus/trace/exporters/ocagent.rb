@@ -17,8 +17,8 @@
 
 require "socket"
 require "opencensus/proto/agent/trace/v1/trace_service_services_pb"
-require "opencensus/trace/exporters/trace_enumerator_queue"
-require "opencensus/trace/exporters/converter"
+require "opencensus/trace/exporters/ocagent/trace_enumerator_queue"
+require "opencensus/trace/exporters/ocagent/converter"
 
 module OpenCensus
   ## OpenCensus Trace collects distributed traces
@@ -33,15 +33,15 @@ module OpenCensus
       class OCAgent
         # Default agent address
         # @return [String]
-        AGENT_SERVICE_ADDRESS = "localhost:55678"
+        DEFAULT_AGENT_SERVICE_ADDRESS = "localhost:55678"
 
         # Default metric resouce type.
         # @return [String]
-        GLOBAL_RESOURCE_TYPE = "global"
+        DEFAULT_GLOBAL_RESOURCE_TYPE = "global"
 
         # Default trace stream sleep delay time
         # @return [Float]
-        TRACE_STREAM_SLEEP_DELAY = 0.5
+        DEFAULT_TRACE_STREAM_SLEEP_DELAY = 0.5
 
         # @private
         # Namespce alias for agent protobufs.
@@ -72,7 +72,7 @@ module OpenCensus
 
         # @param [String] service_name Name of the service.
         # @param [String] agent_service_address OpenCensus Agent address.
-        #   Default value is {AGENT_SERVICE_ADDRESS}
+        #   Default value is {DEFAULT_AGENT_SERVICE_ADDRESS}
         # @param [String | GRPC::Core::ChannelCredentials| nil] credentials
         #   The gRPC channel credentials PEM file path or channel credentials
         #   object. Default value is `:this_channel_is_insecure`,
@@ -80,22 +80,22 @@ module OpenCensus
         #   an insecure connection.
         # @param [String] resource_type Resource type. Optional.
         #   Resource that is associated with each span which is going to export
-        #   Default value is {GLOBAL_RESOURCE_TYPE}
-        # @param [Hash<String, String>] resource_lables
+        #   Default value is {DEFAULT_GLOBAL_RESOURCE_TYPE}
+        # @param [Hash<String, String>] resource_labels
         #   Optional. Set of labels that describe the resource
         # @param [Integer] trace_stream_sleep_delay Time in seconds.
-        #   Default value {TRACE_STREAM_SLEEP_DELAY}
+        #   Default value {DEFAULT_TRACE_STREAM_SLEEP_DELAY}
         #   Thread sleep time if no span available for export.
         def initialize \
             service_name:,
             agent_service_address: nil,
             credentials: nil,
             resource_type: nil,
-            resource_lables: nil,
+            resource_labels: nil,
             trace_stream_sleep_delay: nil
           @service_name = service_name
           @agent_service_address =
-            agent_service_address || AGENT_SERVICE_ADDRESS
+            agent_service_address || DEFAULT_AGENT_SERVICE_ADDRESS
 
           if credentials.nil?
             @credentials = :this_channel_is_insecure
@@ -107,11 +107,11 @@ module OpenCensus
 
           @node_info = create_node_info
           @resource = create_resource(
-            resource_type || GLOBAL_RESOURCE_TYPE,
-            labels: resource_lables
+            resource_type || DEFAULT_GLOBAL_RESOURCE_TYPE,
+            labels: resource_labels
           )
           @trace_stream_sleep_delay =
-            trace_stream_sleep_delay || TRACE_STREAM_SLEEP_DELAY
+            trace_stream_sleep_delay || DEFAULT_TRACE_STREAM_SLEEP_DELAY
           @stopped = true
           @trace_req_queue = nil
         end
@@ -175,17 +175,24 @@ module OpenCensus
           @trace_req_queue&.push TraceEnumeratorQueue::SENTINEL
         end
 
+        # Check exporter is stopped.
+        #
+        # @return [Boolean]
         def stopped?
           @stopped
         end
 
-        # Start trace export stream
+        # Start trace export stream.
+        #
+        # @return [Boolean] If steam is not started or stop returns true.
+        #  If trace export stream alreay running return false.
         def start
-          return if @trace_req_queue
+          return false unless @stopped
 
           @trace_req_queue = TraceEnumeratorQueue.new @trace_stream_sleep_delay
           Thread.new { background_export_run }
           @stopped = false
+          true
         end
 
         # Export spans to OpenCensus Agent service.

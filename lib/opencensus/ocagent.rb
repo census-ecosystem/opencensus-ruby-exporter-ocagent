@@ -26,4 +26,4 @@ end
 
 require "opencensus/ocagent/version"
 require "opencensus/trace/exporters/ocagent"
-require "opencensus/trace/exporters/sampler"
+require "opencensus/trace/exporters/ocagent/sampler"

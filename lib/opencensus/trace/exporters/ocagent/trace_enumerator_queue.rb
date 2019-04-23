@@ -25,7 +25,7 @@ module OpenCensus
         # @private
         #
         class TraceEnumeratorQueue
-          # Default stop item value
+          # Stop queue item value
           SENTINEL = :STOP
 
           # @param [Float] delay Sleeping time when there no trace object to

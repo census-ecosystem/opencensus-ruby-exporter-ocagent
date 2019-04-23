@@ -28,6 +28,7 @@ module OpenCensus
           # OCAgent span protobuf alias.
           TraceProtos = OpenCensus::Proto::Trace::V1
 
+          # Maximum integer value
           MAX_UINT64 = 0xffffffffffffffff
 
           # Create a converter
